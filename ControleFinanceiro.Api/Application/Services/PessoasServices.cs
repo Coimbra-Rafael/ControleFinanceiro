@@ -190,7 +190,7 @@ public class PessoasServices : IPessoasServices
         await _unitOfWork.CommitAsync();
         return mapper.MapperPessoasParaPessoasDto(await _persistence.BuscandoPessoaPorId(new IdCustomizado(Guid.Parse(model.id))));
         }
-        catch(Exception ex)
+        catch(Exception)
         {
             await _unitOfWork.RollbackAsync();
             throw;

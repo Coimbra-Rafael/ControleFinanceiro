@@ -1,6 +1,5 @@
 using ControleFinanceiro.Api.Domain.Entities;
 using ControleFinanceiro.Api.Domain.Struct;
-using ControleFinanceiro.Api.Infrastructure.Persistence.Context.ConversorTiposCustomizados;
 using Microsoft.EntityFrameworkCore;
 
 namespace ControleFinanceiro.Api.Infrastructure.Persistence.Context;
