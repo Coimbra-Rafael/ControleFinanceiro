@@ -11,6 +11,6 @@ namespace ControleFinanceiro.Api.Application.Interfaces
         Task<PessoasDTO> BuscandoPessoaPorCadastroDePessoasFisica(string cadastroDePessoaFisica);
         Task<PessoasDTO> AdicionaPessoa(PessoasDTO model);
         Task<PessoasDTO> AtualizaPessoa(PessoasDTO model);
-        Task<bool> excluiPessoa(string id);
+        Task<bool> excluirPessoa(string id);
     }
 }
