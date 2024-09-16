@@ -15,4 +15,10 @@ public abstract class Entity
         Id = IdCustomizado.NewGuidCustomerId();
         CreatedOn = DateTime.UtcNow;
     }
+
+    protected Entity(IdCustomizado id)
+    {
+        Id = id;
+        CreatedOn = DateTime.UtcNow;
+    }
 }

@@ -1,5 +1,6 @@
 using ControleFinanceiro.Api.Application.Interfaces;
 using ControleFinanceiro.Api.Application.Services;
+using ControleFinanceiro.Api.Endpoint;
 using ControleFinanceiro.Api.Infrastructure.Persistence.Context;
 using ControleFinanceiro.Api.Infrastructure.Persistence.Interfaces;
 using ControleFinanceiro.Api.Infrastructure.Persistence.Services;
@@ -31,5 +32,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapEndpointPessoas();
 
 app.Run();

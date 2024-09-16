@@ -42,6 +42,10 @@ public class PessoasServices : IPessoasServices
         {
             throw new Exception(ex.Message);
         }
+        finally
+        {
+            _persistence.Dispose();
+        }
 
     }
 
@@ -50,7 +54,7 @@ public class PessoasServices : IPessoasServices
         try
         {
             var pessoa = await _persistence.BuscandoPessoaPorId(new IdCustomizado(Guid.Parse(id)));
-            if(pessoa.Equals(null)) throw new Exception("Não foi possível localizar o id na base!");
+            if (pessoa.Equals(null)) throw new Exception("Não foi possível localizar o id na base!");
             using (var mapper = new MapperPessoas())
             {
                 return mapper.MapperPessoasParaPessoasDto(pessoa);
@@ -61,6 +65,10 @@ public class PessoasServices : IPessoasServices
         {
             throw new Exception(ex.Message);
         }
+        finally
+        {
+            _persistence.Dispose();
+        }
     }
 
     public async Task<IEnumerable<PessoasDTO>?> BuscandoPessoaPorNome(string nome)
@@ -69,7 +77,7 @@ public class PessoasServices : IPessoasServices
         {
             var pessoas = await _persistence.BuscandoPessoaPorNome(nome);
 
-            if(pessoas.Count() > 0)
+            if (pessoas.Count() > 0)
             {
                 using (var mapper = new MapperPessoas())
                 {
@@ -77,11 +85,15 @@ public class PessoasServices : IPessoasServices
                 }
             }
             return null;
-        
+
         }
         catch (Exception ex)
         {
             throw new Exception(ex.Message);
+        }
+        finally
+        {
+            _persistence.Dispose();
         }
     }
 
@@ -93,19 +105,24 @@ public class PessoasServices : IPessoasServices
 
             using (var mapper = new MapperPessoas())
             {
-                return mapper.MapperPessoasParaPessoasDto(pessoa);   
+                return mapper.MapperPessoasParaPessoasDto(pessoa);
+
             }
         }
         catch (Exception ex)
         {
-            
+
             throw new Exception(ex.Message);
+        }
+        finally
+        {
+            _persistence.Dispose();
         }
     }
 
     public async Task<PessoasDTO> BuscandoPessoaPorCadastroDePessoasFisica(string cadastroDePessoaFisica)
     {
-        
+
         try
         {
             var pessoa = await _persistence.BuscandoPessoaPorCadastroDePessoasFisica(cadastroDePessoaFisica);
@@ -118,6 +135,10 @@ public class PessoasServices : IPessoasServices
         catch (Exception ex)
         {
             throw new Exception(ex.Message);
+        }
+        finally
+        {
+            _persistence.Dispose();
         }
     }
 
@@ -156,8 +177,8 @@ public class PessoasServices : IPessoasServices
                 }
                 await _repository.Add(pessoa);
                 var result = await _unitOfWork.CommitAsync();
-                
-                if (result) return mapper.MapperPessoasParaPessoasDto(pessoa);
+
+                if (result)  mapper.MapperPessoasParaPessoasDto(pessoa);
 
                 return null;
             }
@@ -175,22 +196,39 @@ public class PessoasServices : IPessoasServices
         }
     }
 
-    public async Task<PessoasDTO> AtualizaPessoa(PessoasDTO model)
+    public async Task<PessoasDTO> AtualizaPessoa(PessoasDTO model, string id)
     {
         using var mapper = new MapperPessoas();
-        try{
-        var pessoa = await _persistence.BuscandoPessoaPorId(new IdCustomizado(Guid.Parse(model.id)));
+        try
+        {
+            var pessoa = await _persistence.BuscandoPessoaPorId(IdCustomizado.Parse(id));
+            if (pessoa.Equals(null)) throw new Exception("Pessoa não encontrada na base para ser atualizada!");
 
-        await _unitOfWork.BeginTransaction();
+            if(!pessoa.NomeCompleto.Equals(model.nomeCompleto))
+                pessoa.NomeCompleto = model.nomeCompleto;
+            
+            if(!pessoa.RegistroGeral.Equals(model.registroGeral))
+                pessoa.RegistroGeral = model.registroGeral;
 
-        if (pessoa.Equals(null)) throw new Exception("Pessoa não encontrada na base para ser atualizada!");
+            if(!pessoa.CadastroDePessoaFisica.Equals(model.CadastroDePessoaFisica))
+                pessoa.CadastroDePessoaFisica = model.CadastroDePessoaFisica;
 
-        await _repository.Update(mapper.MapperPessoasDtoParaPessoas(model));
+            if(!pessoa.ValorEmConta.Equals(model.ValorEmConta))
+                pessoa.ValorEmConta = model.ValorEmConta;
+            
+            if(!pessoa.ValorInvestido.Equals(model.ValorInvestido))
+                pessoa.ValorInvestido = model.ValorInvestido;
+            
 
-        await _unitOfWork.CommitAsync();
-        return mapper.MapperPessoasParaPessoasDto(await _persistence.BuscandoPessoaPorId(new IdCustomizado(Guid.Parse(model.id))));
+
+            await _unitOfWork.BeginTransaction();            
+            pessoa.UpdateOn = DateTime.UtcNow;
+            await _repository.Update(pessoa);
+
+            await _unitOfWork.CommitAsync();
+            return mapper.MapperPessoasParaPessoasDto(await _persistence.BuscandoPessoaPorId(pessoa.Id));
         }
-        catch(Exception)
+        catch (Exception)
         {
             await _unitOfWork.RollbackAsync();
             throw;
@@ -207,11 +245,11 @@ public class PessoasServices : IPessoasServices
     {
         try
         {
-            var pessoa = await _persistence.BuscandoPessoaPorId(new IdCustomizado(Guid.Parse(id)));
+            var pessoa = await _persistence.BuscandoPessoaPorId(IdCustomizado.Parse(id));
+
+            if (pessoa.Equals(null)) throw new Exception("Não foi possível localizar pessoa na base");
 
             await _unitOfWork.BeginTransaction();
-            if(pessoa.Equals(null)) throw new Exception("Não foi possível localizar pessoa na base");
-
             await _repository.Delete(pessoa);
             return await _unitOfWork.CommitAsync();
         }

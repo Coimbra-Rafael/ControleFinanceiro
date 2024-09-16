@@ -11,7 +11,7 @@ public class Repository : IRepository
     public Repository(ControleFinanceiroDbContext context)
     {
         _context = context;
-        _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
     }
 
     public async Task Add<T>(T entity) where T : class

@@ -1,6 +1,7 @@
 using ControleFinanceiro.Api.Application.DataTransferObject;
 using ControleFinanceiro.Api.Application.Mapper.Interfaces;
 using ControleFinanceiro.Api.Domain.Entities;
+using ControleFinanceiro.Api.Domain.Struct;
 
 namespace ControleFinanceiro.Api.Application.Mapper.Services;
 
@@ -20,7 +21,7 @@ public class MapperPessoas : IMapperPessoas
                 pessoaDto.ValorEmConta,
                 pessoaDto.ValorInvestido,
                 pessoaDto.DataDeNascimento
-            );
+            ) ;
             listaPessoas.Add(pessoa);
         }
         return listaPessoas;
@@ -33,7 +34,7 @@ public class MapperPessoas : IMapperPessoas
         {
             var pessoaDto = new PessoasDTO
             (
-                pessoa.Id.ToString(),
+                pessoa.Id.value.ToString(),
                 pessoa.NomeCompleto,
                 pessoa.RegistroGeral,
                 pessoa.CadastroDePessoaFisica,
@@ -63,7 +64,7 @@ public class MapperPessoas : IMapperPessoas
     {
         return new PessoasDTO
             (
-                pessoa.Id.ToString(),
+                pessoa.Id.value.ToString(),
                 pessoa.NomeCompleto,
                 pessoa.RegistroGeral,
                 pessoa.CadastroDePessoaFisica,
